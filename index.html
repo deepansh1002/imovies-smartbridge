@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iMovies — Movie Ticket Booking Made Simple</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- React & ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <!-- Babel Standalone for live JSX execution -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background-color: #0c1017; color: #fff; min-height: 100vh; }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #0c1017; }
+    ::-webkit-scrollbar-thumb { background: #212836; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #30363d; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // Initial Movies matching screenshot
+    const INITIAL_MOVIES = [
+      { id: "1", name: "Rrr", date: "Mar 25, 2022", genres: ["Action", "Drama"], poster: "https://m.media-amazon.com/images/M/MV5BODUwNDNjMTctODUxNy00ZTA2LWIyYTEtMDc5Y2E5NjUzZmMxXkEyXkFqcGc@._V1_.jpg" },
+      { id: "2", name: "Baahubali 2: the conclusion", date: "Apr 25, 2017", genres: ["Action", "Fantasy"], poster: "https://m.media-amazon.com/images/M/MV5BOGNlNmRkMjctNDgxMC00NzFhLWIzY2YtNTk3ZGIzZDA3ZDYyXkEyXkFqcGc@._V1_.jpg" },
+      { id: "3", name: "Og", date: "Sep 25, 2025", genres: ["Action", "Thriller"], poster: "https://m.media-amazon.com/images/M/MV5BNTBmYzI0YjEtM2M0My00MGUyLWI4YTYtNzkzYTEyYjcxMTg1XkEyXkFqcGc@._V1_.jpg" },
+      { id: "4", name: "Rajasaab", date: "Dec 5, 2025", genres: ["Comedy", "Horror"], poster: "https://m.media-amazon.com/images/M/MV5BYzA4ZDQ2NWItNTljNC00NGRhLWE2YmEtYjExMzIxZjg4YjFkXkEyXkFqcGc@._V1_.jpg" },
+      { id: "5", name: "Toxic", date: "Oct 1, 2025", genres: ["Action", "Thriller"], poster: "https://m.media-amazon.com/images/M/MV5BYTRiMjg3NDQtMDU5OC00N2FhLTk1NjYtMjdhMTA3ZWM4Y2ZhXkEyXkFqcGc@._V1_.jpg" },
+      { id: "6", name: "Avatar", date: "Sep 30, 2025", genres: ["Sci-Fi", "Adventure"], poster: "https://m.media-amazon.com/images/M/MV5BYjhiNjBlODctY2ZiOC00YjVlLWFlNzAtNTVhNzM1YjI1NzMxXkEyXkFqcGc@._V1_.jpg" }
+    ];
+
+    // Initial Shows matching screenshot
+    const INITIAL_SHOWS = [
+      { id: "s1", movie: "Og", theatre: "Srinivasa", date: "Sep 25, 2025", time: "2:00 PM" },
+      { id: "s2", movie: "Og", theatre: "Srinivasa", date: "Sep 25, 2025", time: "4:00 PM" },
+      { id: "s3", movie: "Og", theatre: "Srinivasa", date: "Sep 26, 2025", time: "9:00 PM" },
+      { id: "s4", movie: "G2", theatre: "Gokul", date: "Nov 14, 2025", time: "2:00 PM" },
+      { id: "s5", movie: "G2", theatre: "Gokul", date: "Nov 14, 2025", time: "6:00 PM" },
+      { id: "s6", movie: "The pride of bharat", theatre: "Gokul", date: "Jan 2, 2026", time: "9:30 PM" }
+    ];
+
+    // Initial Bookings
+    const INITIAL_BOOKINGS = [
+      {
+        id: "BK-101",
+        movie: "Og",
+        theatre: "Srinivasa",
+        showdate: "Sep 26, 2025",
+        showtime: "21:00",
+        seats: "Middle Seats: 261, 262",
+        price: "260₹",
+        poster: "https://m.media-amazon.com/images/M/MV5BNTBmYzI0YjEtM2M0My00MGUyLWI4YTYtNzkzYTEyYjcxMTg1XkEyXkFqcGc@._V1_.jpg"
+      },
+      {
+        id: "BK-102",
+        movie: "Og",
+        theatre: "Srinivasa",
+        showdate: "Sep 26, 2025",
+        showtime: "21:00",
+        seats: "Balcony Seats: 162",
+        price: "175₹",
+        poster: "https://m.media-amazon.com/images/M/MV5BNTBmYzI0YjEtM2M0My00MGUyLWI4YTYtNzkzYTEyYjcxMTg1XkEyXkFqcGc@._V1_.jpg"
+      },
+      {
+        id: "BK-103",
+        movie: "The pride of bharat",
+        theatre: "Gokul",
+        showdate: "Jan 2, 2026",
+        showtime: "21:30",
+        seats: "Balcony Seats: 198",
+        price: "200₹",
+        poster: "https://m.media-amazon.com/images/M/MV5BYzA4ZDQ2NWItNTljNC00NGRhLWE2YmEtYjExMzIxZjg4YjFkXkEyXkFqcGc@._V1_.jpg"
+      }
+    ];
+
+    function App() {
+      const [currentView, setCurrentView] = useState("landing"); // landing, login, register, home, shows, seats, bookings, admin, addMovie, addShow, addTheatre, adminLogin
+      const [user, setUser] = useState(null);
+      const [isAdmin, setIsAdmin] = useState(false);
+      const [movies, setMovies] = useState(INITIAL_MOVIES);
+      const [shows, setShows] = useState(INITIAL_SHOWS);
+      const [bookings, setBookings] = useState(INITIAL_BOOKINGS);
+      const [selectedMovie, setSelectedMovie] = useState(null);
+      const [selectedShow, setSelectedShow] = useState(null);
+      const [selectedSeats, setSelectedSeats] = useState([]);
+      const [searchQuery, setSearchQuery] = useState("");
+      const [showPassword, setShowPassword] = useState(false);
+
+      const navTo = (view, data = null) => {
+        if (data?.movie) setSelectedMovie(data.movie);
+        if (data?.show) setSelectedShow(data.show);
+        setCurrentView(view);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      };
+
+      // Top Navigation Bar
+      const renderNavbar = (adminMode = false) => (
+        <nav style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "0.8rem 2.5rem",
+          background: "#131926",
+          borderBottom: "1px solid #1f2738",
+          position: "sticky",
+          top: 0,
+          zIndex: 100
+        }}>
+          <div style={{ cursor: "pointer", fontSize: "1.6rem", fontWeight: "bold" }} onClick={() => navTo("home")}>
+            <span style={{ color: "#fff" }}>i</span><span style={{ color: "#e50914" }}>Movies</span>
+          </div>
+
+          {!adminMode && (
+            <div style={{ display: "flex", alignItems: "center", width: "35%", maxWidth: "420px" }}>
+              <input
+                type="text"
+                placeholder="Search movies..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "0.55rem 1rem",
+                  background: "#1f2738",
+                  border: "1px solid #303a4e",
+                  borderRadius: "4px",
+                  color: "#fff",
+                  outline: "none"
+                }}
+              />
+            </div>
+          )}
+
+          <div style={{ display: "flex", gap: "1.4rem", alignItems: "center", fontSize: "1.2rem", color: "#8b949e" }}>
+            <span title="Light / Dark Mode" style={{ cursor: "pointer" }}>☀️</span>
+            <span title="Home" style={{ cursor: "pointer", color: currentView === "home" ? "#fff" : "#8b949e" }} onClick={() => navTo("home")}>🏠</span>
+            
+            {!adminMode ? (
+              <>
+                <span title="Favorites" style={{ cursor: "pointer" }} onClick={() => alert("Added to your favorites list!")}>❤️</span>
+                <span title="My Bookings" style={{ cursor: "pointer", color: currentView === "bookings" ? "#fff" : "#8b949e" }} onClick={() => navTo("bookings")}>👤</span>
+                <button
+                  onClick={() => { setIsAdmin(true); navTo("admin"); }}
+                  style={{
+                    cursor: "pointer",
+                    fontSize: "0.85rem",
+                    color: "#e50914",
+                    background: "transparent",
+                    border: "1px solid #e50914",
+                    padding: "0.25rem 0.75rem",
+                    borderRadius: "4px",
+                    fontWeight: "600"
+                  }}
+                >
+                  Admin
+                </button>
+              </>
+            ) : (
+              <>
+                <span title="Shows" style={{ cursor: "pointer", color: currentView === "admin" ? "#fff" : "#8b949e" }} onClick={() => navTo("admin")}>📅</span>
+                <span title="Add Movie" style={{ cursor: "pointer", color: currentView === "addMovie" ? "#fff" : "#8b949e" }} onClick={() => navTo("addMovie")}>➕</span>
+                <span title="Add Show" style={{ cursor: "pointer", color: currentView === "addShow" ? "#fff" : "#8b949e" }} onClick={() => navTo("addShow")}>🎟️</span>
+                <span title="Add Theatre" style={{ cursor: "pointer", color: currentView === "addTheatre" ? "#fff" : "#8b949e" }} onClick={() => navTo("addTheatre")}>🎭</span>
+                <span title="Bookings History" style={{ cursor: "pointer" }} onClick={() => navTo("bookings")}>🕒</span>
+                <span title="Exit Admin Portal" style={{ cursor: "pointer", color: "#e50914" }} onClick={() => { setIsAdmin(false); navTo("home"); }}>↪️</span>
+              </>
+            )}
+          </div>
+        </nav>
+      );
+
+      // 1. Landing View (Screenshot 7)
+      if (currentView === "landing") {
+        return (
+          <div style={{
+            minHeight: "100vh",
+            background: "#080b11",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            padding: "0 10vw"
+          }}>
+            <h1 style={{ fontSize: "3.8rem", fontWeight: "800", marginBottom: "1rem" }}>
+              Welcome to <span style={{ color: "#e50914" }}>iMovies</span>
+            </h1>
+            <p style={{ fontSize: "1.25rem", color: "#9ca3af", maxWidth: "600px", marginBottom: "2.5rem", lineHeight: "1.6" }}>
+              Your ultimate destination for the latest blockbusters and timeless classics
+            </p>
+            <div style={{ display: "flex", gap: "1.2rem", alignItems: "center" }}>
+              <button
+                onClick={() => navTo("login")}
+                style={{ backgroundColor: "#e50914", color: "#fff", padding: "0.75rem 2.2rem", borderRadius: "50px", border: "none", fontWeight: "600", fontSize: "1rem", cursor: "pointer" }}
+              >
+                Sign In
+              </button>
+              <button
+                onClick={() => navTo("register")}
+                style={{ backgroundColor: "transparent", color: "#fff", padding: "0.75rem 2.2rem", borderRadius: "50px", border: "1px solid #4b5563", fontWeight: "600", fontSize: "1rem", cursor: "pointer" }}
+              >
+                Sign Up
+              </button>
+              <button
+                onClick={() => navTo("home")}
+                style={{ backgroundColor: "#1f2738", color: "#cbd5e1", padding: "0.75rem 1.8rem", borderRadius: "50px", border: "none", fontWeight: "600", fontSize: "0.95rem", cursor: "pointer", marginLeft: "0.5rem" }}
+              >
+                Explore Catalog →
+              </button>
+            </div>
+          </div>
+        );
+      }
+
+      // 2. Register View (Screenshot 7)
+      if (currentView === "register") {
+        return (
+          <div style={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center", background: "#0c1017", padding: "2rem" }}>
+            <div style={{ background: "#131926", border: "1px solid #7f1d1d", borderRadius: "10px", padding: "2.5rem 2rem", width: "100%", maxWidth: "420px" }}>
+              <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
+                <h1 style={{ fontSize: "2rem", fontWeight: "bold" }}><span>i</span><span style={{ color: "#e50914" }}>Movies</span></h1>
+                <h2 style={{ fontSize: "1.1rem", fontWeight: "normal", color: "#cbd5e1", marginTop: "0.5rem" }}>Register</h2>
+              </div>
+              <form onSubmit={(e) => { e.preventDefault(); setUser({ name: "Demo User", email: "user@imovies.com" }); navTo("home"); }}>
+                <div style={{ marginBottom: "1rem" }}>
+                  <label style={{ display: "block", fontSize: "0.85rem", color: "#94a3b8", marginBottom: "0.3rem" }}>Username</label>
+                  <input type="text" placeholder="Enter Username" required style={{ width: "100%", padding: "0.65rem", background: "#1f2738", border: "1px solid #334155", color: "#fff", borderRadius: "5px" }} />
+                </div>
+                <div style={{ marginBottom: "1rem" }}>
+                  <label style={{ display: "block", fontSize: "0.85rem", color: "#94a3b8", marginBottom: "0.3rem" }}>Email</label>
+                  <input type="email" placeholder="Enter your email" required style={{ width: "100%", padding: "0.65rem", background: "#1f2738", border: "1px solid #334155", color: "#fff", borderRadius: "5px" }} />
+                </div>
+                <div style={{ marginBottom: "1rem" }}>
+                  <label style={{ display: "block", fontSize: "0.85rem", color: "#94a3b8", marginBottom: "0.3rem" }}>Password</label>
+                  <input type={showPassword ? "text" : "password"} placeholder="Enter your password" required style={{ width: "100%", padding: "0.65rem", background: "#1f2738", border: "1px solid #334155", color: "#fff", borderRadius: "5px" }} />
+                </div>
+                <div style={{ marginBottom: "1rem" }}>
+                  <label style={{ display: "block", fontSize: "0.85rem", color: "#94a3b8", marginBottom: "0.3rem" }}>Confirm Password</label>
+                  <input type={showPassword ? "text" : "password"} placeholder="Confirm your password" required style={{ width: "100%", padding: "0.65rem", background: "#1f2738", border: "1px solid #334155", color: "#fff", borderRadius: "5px" }} />
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1.2rem", fontSize: "0.85rem", color: "#94a3b8" }}>
+                  <input type="checkbox" id="showPassReg" checked={showPassword} onChange={(e) => setShowPassword(e.target.checked)} />
+                  <label htmlFor="showPassReg" style={{ cursor: "pointer" }}>Show Password</label>
+                </div>
+                <button type="submit" style={{ width: "100%", padding: "0.75rem", background: "#e50914", color: "#fff", border: "none", borderRadius: "5px", fontWeight: "600", cursor: "pointer" }}>
+                  Submit
+                </button>
+                <p style={{ marginTop: "1.2rem", fontSize: "0.85rem", textAlign: "center", color: "#94a3b8" }}>
+                  Already have an account? <span onClick={() => navTo("login")} style={{ color: "#e50914", cursor: "pointer", fontWeight: "600" }}>Login</span>
+                </p>
+                <p style={{ marginTop: "0.5rem", fontSize: "0.85rem", textAlign: "center", color: "#94a3b8" }}>
+                  Register as an <span onClick={() => { setIsAdmin(true); navTo("admin"); }} style={{ color: "#e50914", cursor: "pointer", fontWeight: "600" }}>Admin</span>
+                </p>
+              </form>
+            </div>
+          </div>
+        );
+      }
+
+      // 3. Login View (Screenshot 8)
+      if (currentView === "login") {
+        return (
+          <div style={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center", background: "#0c1017", padding: "2rem" }}>
+            <div style={{ background: "#131926", border: "1px solid #7f1d1d", borderRadius: "10px", padding: "2.5rem 2rem", width: "100%", maxWidth: "400px" }}>
+              <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
+                <h1 style={{ fontSize: "2rem", fontWeight: "bold" }}><span>i</span><span style={{ color: "#e50914" }}>Movies</span></h1>
+                <h2 style={{ fontSize: "1.1rem", fontWeight: "normal", color: "#cbd5e1", marginTop: "0.5rem" }}>Login</h2>
+              </div>
+              <form onSubmit={(e) => { e.preventDefault(); setUser({ name: "Demo User", email: "user@imovies.com" }); navTo("home"); }}>
+                <div style={{ marginBottom: "1rem" }}>
+                  <label style={{ display: "block", fontSize: "0.85rem", color: "#94a3b8", marginBottom: "0.3rem" }}>Email</label>
+                  <input type="email" placeholder="Enter your email" defaultValue="user@imovies.com" required style={{ width: "100%", padding: "0.65rem", background: "#1f2738", border: "1px solid #334155", color: "#fff", borderRadius: "5px" }} />
+                </div>
+                <div style={{ marginBottom: "1rem" }}>
+                  <label style={{ display: "block", fontSize: "0.85rem", color: "#94a3b8", marginBottom: "0.3rem" }}>Password</label>
+                  <input type={showPassword ? "text" : "password"} placeholder="Enter your password" defaultValue="password123" required style={{ width: "100%", padding: "0.65rem", background: "#1f2738", border: "1px solid #334155", color: "#fff", borderRadius: "5px" }} />
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1.2rem", fontSize: "0.85rem", color: "#94a3b8" }}>
+                  <input type="checkbox" id="showPassLog" checked={showPassword} onChange={(e) => setShowPassword(e.target.checked)} />
+                  <label htmlFor="showPassLog" style={{ cursor: "pointer" }}>Show Password</label>
+                </div>
+                <button type="submit" style={{ width: "100%", padding: "0.75rem", background: "#e50914", color: "#fff", border: "none", borderRadius: "5px", fontWeight: "600", cursor: "pointer" }}>
+                  Submit
+                </button>
+                <p style={{ marginTop: "1.5rem", fontSize: "0.85rem", textAlign: "center", color: "#94a3b8" }}>
+                  Create an account <span onClick={() => navTo("register")} style={{ color: "#e50914", cursor: "pointer", fontWeight: "600" }}>Register</span>
+                </p>
+              </form>
+            </div>
+          </div>
+        );
+      }
+
+      // 4. Home View (Available Movies - Screenshot 9)
+      if (currentView === "home") {
+        const filtered = movies.filter(m => m.name.toLowerCase().includes(searchQuery.toLowerCase()));
+        return (
+          <div>
+            {renderNavbar(isAdmin)}
+            
+            {/* Red Available Movies Header Banner */}
+            <div style={{ background: "#e50914", color: "#fff", padding: "0.8rem 1rem", textAlign: "center", fontWeight: "bold", fontSize: "1.25rem", letterSpacing: "0.5px" }}>
+              Available Movies
+            </div>
+
+            <div style={{ padding: "2rem 3rem" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "1.8rem" }}>
+                {filtered.map((movie) => (
+                  <div
+                    key={movie.id}
+                    style={{ background: "#131926", borderRadius: "8px", overflow: "hidden", position: "relative", border: "1px solid #1f2738" }}
+                  >
+                    {/* Delete circle button if in Admin mode */}
+                    {isAdmin && (
+                      <button
+                        title="Delete Movie"
+                        onClick={(e) => { e.stopPropagation(); setMovies(movies.filter(m => m.id !== movie.id)); }}
+                        style={{
+                          position: "absolute",
+                          top: "8px",
+                          right: "8px",
+                          width: "28px",
+                          height: "28px",
+                          borderRadius: "50%",
+                          background: "#fff",
+                          border: "none",
+                          color: "#e50914",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          cursor: "pointer",
+                          zIndex: 10,
+                          boxShadow: "0 2px 5px rgba(0,0,0,0.4)"
+                        }}
+                      >
+                        🗑️
+                      </button>
+                    )}
+
+                    <div
+                      onClick={() => navTo("shows", { movie })}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <div style={{ height: "250px", overflow: "hidden", background: "#0a0d14" }}>
+                        <img src={movie.poster} alt={movie.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      </div>
+                      <div style={{ padding: "0.8rem" }}>
+                        <h3 style={{ fontSize: "0.95rem", fontWeight: "600", margin: "0 0 0.3rem 0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{movie.name}</h3>
+                        <p style={{ fontSize: "0.75rem", color: "#8b949e", margin: "0 0 0.5rem 0" }}>📅 {movie.date}</p>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.3rem" }}>
+                          {movie.genres.map((g, i) => (
+                            <span key={i} style={{ background: "#7f1d1d", color: "#fca5a5", fontSize: "0.65rem", padding: "0.15rem 0.4rem", borderRadius: "3px" }}>{g}</span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // 5. Shows View
+      if (currentView === "shows") {
+        return (
+          <div>
+            {renderNavbar(isAdmin)}
+            <div style={{ padding: "2rem 3rem", maxWidth: "900px", margin: "0 auto" }}>
+              <button onClick={() => navTo("home")} style={{ background: "none", border: "none", color: "#e50914", cursor: "pointer", marginBottom: "1rem", fontSize: "1rem" }}>← Back to Movies</button>
+              <h2>Available Shows for <span style={{ color: "#e50914" }}>{selectedMovie?.name || "Movie"}</span></h2>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "1.5rem", marginTop: "1.5rem" }}>
+                {shows.filter(s => !selectedMovie || s.movie === selectedMovie.name).concat(
+                  shows.filter(s => selectedMovie && s.movie !== selectedMovie.name).slice(0, 2)
+                ).map((s) => (
+                  <div key={s.id} style={{ background: "#131926", padding: "1.5rem", borderRadius: "8px", border: "1px solid #1f2738" }}>
+                    <h3 style={{ color: "#fff", marginBottom: "0.5rem" }}>🏛️ {s.theatre}</h3>
+                    <p style={{ color: "#8b949e", margin: "0.2rem 0" }}>📅 Date: {s.date}</p>
+                    <p style={{ color: "#8b949e", margin: "0.2rem 0" }}>⏰ Time: {s.time}</p>
+                    <button
+                      onClick={() => navTo("seats", { show: s })}
+                      style={{ marginTop: "1rem", width: "100%", background: "#e50914", color: "#fff", border: "none", padding: "0.6rem", borderRadius: "4px", cursor: "pointer", fontWeight: "bold" }}
+                    >
+                      Select Seats
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // 6. Interactive Seat Selection View (with 3-Tier Seating: Balcony, Middle, Lower)
+      if (currentView === "seats") {
+        const toggleSeat = (seatId, tierPrice) => {
+          setSelectedSeats(prev => {
+            const exists = prev.find(s => s.id === seatId);
+            if (exists) return prev.filter(s => s.id !== seatId);
+            return [...prev, { id: seatId, price: tierPrice }];
+          });
+        };
+
+        const totalAmt = selectedSeats.reduce((acc, s) => acc + s.price, 0);
+
+        const confirmOrder = () => {
+          if (!selectedSeats.length) return;
+          const newBooking = {
+            id: "BK-" + Math.floor(1000 + Math.random() * 9000),
+            movie: selectedMovie?.name || selectedShow?.movie || "Og",
+            theatre: selectedShow?.theatre || "Srinivasa",
+            showdate: selectedShow?.date || "Sep 26, 2025",
+            showtime: selectedShow?.time || "21:00",
+            seats: `Selected (${selectedSeats.length}): ${selectedSeats.map(s => s.id).join(", ")}`,
+            price: `${totalAmt}₹`,
+            poster: selectedMovie?.poster || "https://m.media-amazon.com/images/M/MV5BNTBmYzI0YjEtM2M0My00MGUyLWI4YTYtNzkzYTEyYjcxMTg1XkEyXkFqcGc@._V1_.jpg"
+          };
+          setBookings([newBooking, ...bookings]);
+          setSelectedSeats([]);
+          navTo("bookings");
+        };
+
+        return (
+          <div>
+            {renderNavbar(false)}
+            <div style={{ padding: "2rem 3rem", maxWidth: "840px", margin: "0 auto", textAlign: "center" }}>
+              <h2>Select Your Seats — <span style={{ color: "#e50914" }}>{selectedShow?.theatre} ({selectedShow?.time})</span></h2>
+              
+              <div style={{ background: "#131926", padding: "2rem", borderRadius: "10px", margin: "2rem 0", border: "1px solid #1f2738" }}>
+                <div style={{ height: "4px", background: "#e50914", width: "70%", margin: "0 auto 1.5rem auto", borderRadius: "2px" }}></div>
+                <p style={{ color: "#8b949e", fontSize: "0.85rem", marginBottom: "2rem" }}>SCREEN THIS WAY</p>
+                
+                {/* 3 Tiers */}
+                <div style={{ marginBottom: "1.5rem" }}>
+                  <p style={{ fontSize: "0.85rem", color: "#fca5a5", fontWeight: "bold", marginBottom: "0.5rem" }}>BALCONY (₹200)</p>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(8, 1fr)", gap: "0.5rem", maxWidth: "450px", margin: "0 auto" }}>
+                    {Array.from({ length: 8 }, (_, i) => {
+                      const seatId = `B${i + 1}`;
+                      const isSel = selectedSeats.some(s => s.id === seatId);
+                      return (
+                        <button key={seatId} onClick={() => toggleSeat(seatId, 200)} style={{ padding: "0.5rem", background: isSel ? "#e50914" : "#1f2738", color: "#fff", border: "1px solid #334155", borderRadius: "4px", cursor: "pointer", fontWeight: "bold" }}>
+                          {seatId}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: "1.5rem" }}>
+                  <p style={{ fontSize: "0.85rem", color: "#93c5fd", fontWeight: "bold", marginBottom: "0.5rem" }}>MIDDLE (₹130)</p>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(8, 1fr)", gap: "0.5rem", maxWidth: "450px", margin: "0 auto" }}>
+                    {Array.from({ length: 16 }, (_, i) => {
+                      const seatId = `M${i + 1}`;
+                      const isSel = selectedSeats.some(s => s.id === seatId);
+                      return (
+                        <button key={seatId} onClick={() => toggleSeat(seatId, 130)} style={{ padding: "0.5rem", background: isSel ? "#e50914" : "#1f2738", color: "#fff", border: "1px solid #334155", borderRadius: "4px", cursor: "pointer", fontWeight: "bold" }}>
+                          {seatId}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div>
+                  <p style={{ fontSize: "0.85rem", color: "#86efac", fontWeight: "bold", marginBottom: "0.5rem" }}>LOWER (₹80)</p>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(8, 1fr)", gap: "0.5rem", maxWidth: "450px", margin: "0 auto" }}>
+                    {Array.from({ length: 8 }, (_, i) => {
+                      const seatId = `L${i + 1}`;
+                      const isSel = selectedSeats.some(s => s.id === seatId);
+                      return (
+                        <button key={seatId} onClick={() => toggleSeat(seatId, 80)} style={{ padding: "0.5rem", background: isSel ? "#e50914" : "#1f2738", color: "#fff", border: "1px solid #334155", borderRadius: "4px", cursor: "pointer", fontWeight: "bold" }}>
+                          {seatId}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {selectedSeats.length > 0 && (
+                <div style={{ background: "#131926", padding: "1.5rem", borderRadius: "8px", border: "1px solid #1f2738", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div style={{ textAlign: "left" }}>
+                    <p>Selected Seats: <strong>{selectedSeats.map(s => s.id).join(", ")}</strong></p>
+                    <p style={{ color: "#fca5a5" }}>Total Price: <strong>{totalAmt}₹</strong></p>
+                  </div>
+                  <button
+                    onClick={confirmOrder}
+                    style={{ background: "#e50914", color: "#fff", border: "none", padding: "0.8rem 2.2rem", borderRadius: "4px", fontWeight: "bold", cursor: "pointer" }}
+                  >
+                    Confirm & Book Now
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      // 7. Your Bookings View (User Orders)
+      if (currentView === "bookings") {
+        return (
+          <div>
+            {renderNavbar(isAdmin)}
+            <div style={{ padding: "2rem 3rem" }}>
+              <h2 style={{ textAlign: "center", fontSize: "2rem", fontWeight: "bold", margin: "1rem 0 2.5rem 0" }}>
+                Your <span style={{ color: "#e50914" }}>Bookings</span>
+              </h2>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "1.5rem" }}>
+                {bookings.map((b) => (
+                  <div key={b.id} style={{ display: "flex", background: "#131926", borderRadius: "8px", overflow: "hidden", border: "1px solid #1f2738" }}>
+                    <img src={b.poster} alt={b.movie} style={{ width: "120px", height: "160px", objectFit: "cover" }} />
+                    <div style={{ padding: "0.8rem 1rem", display: "flex", flexDirection: "column", justifyContent: "space-between", flex: 1, fontSize: "0.85rem" }}>
+                      <div>
+                        <p style={{ margin: "0 0 0.25rem 0" }}><strong>Movie:</strong> {b.movie}</p>
+                        <p style={{ margin: "0 0 0.25rem 0", color: "#8b949e" }}><strong>Theatre:</strong> {b.theatre}</p>
+                        <p style={{ margin: "0 0 0.25rem 0", color: "#8b949e" }}><strong>Showdate:</strong> {b.showdate}</p>
+                        <p style={{ margin: "0 0 0.25rem 0", color: "#8b949e" }}><strong>showtime:</strong> {b.showtime}</p>
+                        <p style={{ margin: "0 0 0.25rem 0", color: "#fca5a5" }}>{b.seats}</p>
+                      </div>
+                      <p style={{ margin: "0.5rem 0 0 0", fontWeight: "bold", fontSize: "0.95rem" }}>Total Price: {b.price}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // 8. Admin Dashboard (Screenshot 8)
+      if (currentView === "admin") {
+        const deleteShow = (id) => setShows(shows.filter(s => s.id !== id));
+        return (
+          <div>
+            {renderNavbar(true)}
+            <div style={{ padding: "2rem 3rem" }}>
+              <h2 style={{ fontSize: "1.8rem", fontWeight: "bold", margin: "1rem 0 1.5rem 0" }}>
+                Admin <span style={{ color: "#e50914" }}>Shows</span>
+              </h2>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "1.2rem" }}>
+                {shows.map((s) => (
+                  <div key={s.id} style={{ background: "#131926", padding: "1.2rem", borderRadius: "8px", border: "1px solid #1f2738", fontSize: "0.85rem" }}>
+                    <p style={{ margin: "0 0 0.3rem 0" }}>📹 <strong>Movie:</strong> {s.movie}</p>
+                    <p style={{ margin: "0 0 0.3rem 0", color: "#8b949e" }}>Theatre: {s.theatre}</p>
+                    <p style={{ margin: "0 0 0.3rem 0", color: "#8b949e" }}>Showdate: {s.date}</p>
+                    <p style={{ margin: "0 0 0.8rem 0", color: "#8b949e" }}>Showtime: {s.time}</p>
+                    <button
+                      onClick={() => deleteShow(s.id)}
+                      style={{ width: "100%", padding: "0.4rem", background: "transparent", border: "1px solid #7f1d1d", color: "#fca5a5", borderRadius: "4px", cursor: "pointer" }}
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <h2 style={{ fontSize: "1.8rem", fontWeight: "bold", margin: "3rem 0 1.5rem 0" }}>
+                All <span style={{ color: "#e50914" }}>Bookings</span>
+              </h2>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "1.2rem" }}>
+                <div style={{ background: "#131926", padding: "1.2rem", borderRadius: "8px", border: "1px solid #1f2738", fontSize: "0.85rem" }}>
+                  <p>👤 <strong>User:</strong> gvvdkumar@gmail.com</p>
+                  <p style={{ color: "#8b949e", marginTop: "0.3rem" }}>Booking: Og at Srinivasa (₹260)</p>
+                </div>
+                <div style={{ background: "#131926", padding: "1.2rem", borderRadius: "8px", border: "1px solid #1f2738", fontSize: "0.85rem" }}>
+                  <p>👤 <strong>User:</strong> deepansh1002@gmail.com</p>
+                  <p style={{ color: "#8b949e", marginTop: "0.3rem" }}>Booking: Rrr at Gokul (₹200)</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // 9. Admin Add Movie View (Screenshot 9)
+      if (currentView === "addMovie") {
+        return (
+          <div>
+            {renderNavbar(true)}
+            <div style={{ padding: "2rem 3rem", maxWidth: "800px", margin: "0 auto" }}>
+              <div style={{ height: "160px", border: "1px dashed #e50914", borderRadius: "8px", display: "flex", justifyContent: "center", alignItems: "center", background: "#131926", marginBottom: "1.5rem", fontSize: "1.2rem", color: "#e50914" }}>
+                🚫 Drop Poster File Here
+              </div>
+              <h2 style={{ textAlign: "center", fontSize: "1.8rem", margin: "0 0 1.5rem 0" }}>Add <span style={{ color: "#e50914" }}>Movie</span></h2>
+              <form onSubmit={(e) => { e.preventDefault(); alert("Movie registered to catalog!"); navTo("home"); }} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "0.8rem", color: "#8b949e", marginBottom: "0.2rem" }}>Movie</label>
+                  <input type="text" placeholder="Enter movie name" required style={{ width: "100%", padding: "0.6rem", background: "#1f2738", border: "1px solid #334155", color: "#fff", borderRadius: "4px" }} />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: "0.8rem", color: "#8b949e", marginBottom: "0.2rem" }}>Description</label>
+                  <input type="text" placeholder="Enter movie description" required style={{ width: "100%", padding: "0.6rem", background: "#1f2738", border: "1px solid #334155", color: "#fff", borderRadius: "4px" }} />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: "0.8rem", color: "#8b949e", marginBottom: "0.2rem" }}>Genres</label>
+                  <input type="text" placeholder="Enter movie genres separated by commas" required style={{ width: "100%", padding: "0.6rem", background: "#1f2738", border: "1px solid #334155", color: "#fff", borderRadius: "4px" }} />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: "0.8rem", color: "#8b949e", marginBottom: "0.2rem" }}>Release Date</label>
+                  <input type="date" required style={{ width: "100%", padding: "0.6rem", background: "#1f2738", border: "1px solid #334155", color: "#fff", borderRadius: "4px" }} />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: "0.8rem", color: "#8b949e", marginBottom: "0.2rem" }}>Runtime</label>
+                  <input type="text" placeholder="Enter runtime in minutes" required style={{ width: "100%", padding: "0.6rem", background: "#1f2738", border: "1px solid #334155", color: "#fff", borderRadius: "4px" }} />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: "0.8rem", color: "#8b949e", marginBottom: "0.2rem" }}>Certification</label>
+                  <input type="text" placeholder="Enter movie certification (e.g. U/A)" required style={{ width: "100%", padding: "0.6rem", background: "#1f2738", border: "1px solid #334155", color: "#fff", borderRadius: "4px" }} />
+                </div>
+                <div style={{ gridColumn: "span 2" }}>
+                  <label style={{ display: "block", fontSize: "0.8rem", color: "#8b949e", marginBottom: "0.2rem" }}>Trailer URL (YouTube)</label>
+                  <input type="url" placeholder="https://www.youtube.com/watch?v=..." style={{ width: "100%", padding: "0.6rem", background: "#1f2738", border: "1px solid #334155", color: "#fff", borderRadius: "4px" }} />
+                </div>
+                <div style={{ gridColumn: "span 2", textAlign: "center", marginTop: "1rem" }}>
+                  <button type="submit" style={{ background: "#e50914", color: "#fff", padding: "0.7rem 2.5rem", border: "none", borderRadius: "4px", fontWeight: "bold", cursor: "pointer" }}>Submit</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        );
+      }
+
+      // 10. Admin Add Show View (Screenshot 10)
+      if (currentView === "addShow") {
+        return (
+          <div>
+            {renderNavbar(true)}
+            <div style={{ padding: "4rem 2rem", display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <h2 style={{ fontSize: "2rem", fontWeight: "bold", marginBottom: "2rem" }}>Add <span style={{ color: "#e50914" }}>Show</span></h2>
+              <form onSubmit={(e) => { e.preventDefault(); alert("Show scheduled successfully!"); navTo("admin"); }} style={{ background: "#131926", padding: "2.5rem", borderRadius: "10px", width: "100%", maxWidth: "480px", border: "1px solid #1f2738" }}>
+                <div style={{ marginBottom: "1.2rem" }}>
+                  <label style={{ display: "block", fontSize: "0.85rem", color: "#8b949e", marginBottom: "0.3rem" }}>Theatres</label>
+                  <select required style={{ width: "100%", padding: "0.7rem", background: "#1f2738", border: "1px solid #334155", color: "#fff", borderRadius: "4px" }}>
+                    <option value="">Select Theatre</option>
+                    <option value="Srinivasa">Srinivasa</option>
+                    <option value="Gokul">Gokul</option>
+                  </select>
+                </div>
+                <div style={{ marginBottom: "1.2rem" }}>
+                  <label style={{ display: "block", fontSize: "0.85rem", color: "#8b949e", marginBottom: "0.3rem" }}>Movies</label>
+                  <select required style={{ width: "100%", padding: "0.7rem", background: "#1f2738", border: "1px solid #334155", color: "#fff", borderRadius: "4px" }}>
+                    <option value="">Select Movie</option>
+                    <option value="Og">Og</option>
+                    <option value="Rrr">Rrr</option>
+                    <option value="Toxic">Toxic</option>
+                  </select>
+                </div>
+                <div style={{ marginBottom: "1.2rem" }}>
+                  <label style={{ display: "block", fontSize: "0.85rem", color: "#8b949e", marginBottom: "0.3rem" }}>Show Date</label>
+                  <input type="date" required style={{ width: "100%", padding: "0.7rem", background: "#1f2738", border: "1px solid #334155", color: "#fff", borderRadius: "4px" }} />
+                </div>
+                <div style={{ marginBottom: "2rem" }}>
+                  <label style={{ display: "block", fontSize: "0.85rem", color: "#8b949e", marginBottom: "0.3rem" }}>Showtime</label>
+                  <input type="time" required style={{ width: "100%", padding: "0.7rem", background: "#1f2738", border: "1px solid #334155", color: "#fff", borderRadius: "4px" }} />
+                </div>
+                <div style={{ textAlign: "center" }}>
+                  <button type="submit" style={{ background: "#e50914", color: "#fff", padding: "0.7rem 2.5rem", border: "none", borderRadius: "4px", fontWeight: "bold", cursor: "pointer" }}>Submit</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        );
+      }
+
+      // 11. Admin Add Theatre View (Screenshot 10)
+      if (currentView === "addTheatre") {
+        return (
+          <div>
+            {renderNavbar(true)}
+            <div style={{ padding: "4rem 2rem", display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <h2 style={{ fontSize: "2rem", fontWeight: "bold", marginBottom: "2rem" }}>Add <span style={{ color: "#e50914" }}>Theatre</span></h2>
+              <form onSubmit={(e) => { e.preventDefault(); alert("Theatre registered successfully!"); navTo("admin"); }} style={{ background: "#131926", padding: "2.5rem", borderRadius: "10px", width: "100%", maxWidth: "540px", border: "1px solid #1f2738" }}>
+                <div style={{ marginBottom: "1.2rem" }}>
+                  <label style={{ display: "block", fontSize: "0.85rem", color: "#8b949e", marginBottom: "0.3rem" }}>Theatre Name</label>
+                  <input type="text" placeholder="Enter theatre name" required style={{ width: "100%", padding: "0.7rem", background: "#1f2738", border: "1px solid #334155", color: "#fff", borderRadius: "4px" }} />
+                </div>
+                <div style={{ marginBottom: "1.2rem" }}>
+                  <label style={{ display: "block", fontSize: "0.85rem", color: "#8b949e", marginBottom: "0.3rem" }}>Theatre location</label>
+                  <input type="text" placeholder="Enter theatre location" required style={{ width: "100%", padding: "0.7rem", background: "#1f2738", border: "1px solid #334155", color: "#fff", borderRadius: "4px" }} />
+                </div>
+                
+                {/* 3-Tier Configuration matching Screenshot 10 */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
+                  <div>
+                    <label style={{ display: "block", fontSize: "0.85rem", color: "#8b949e", marginBottom: "0.3rem" }}>Balcony Seat Price</label>
+                    <input type="number" defaultValue="0" style={{ width: "100%", padding: "0.7rem", background: "#1f2738", border: "1px solid #334155", color: "#fff", borderRadius: "4px" }} />
+                  </div>
+                  <div>
+                    <label style={{ display: "block", fontSize: "0.85rem", color: "#8b949e", marginBottom: "0.3rem" }}>Balcony Seat Count</label>
+                    <input type="number" defaultValue="0" style={{ width: "100%", padding: "0.7rem", background: "#1f2738", border: "1px solid #334155", color: "#fff", borderRadius: "4px" }} />
+                  </div>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
+                  <div>
+                    <label style={{ display: "block", fontSize: "0.85rem", color: "#8b949e", marginBottom: "0.3rem" }}>Middle Seat Price</label>
+                    <input type="number" defaultValue="0" style={{ width: "100%", padding: "0.7rem", background: "#1f2738", border: "1px solid #334155", color: "#fff", borderRadius: "4px" }} />
+                  </div>
+                  <div>
+                    <label style={{ display: "block", fontSize: "0.85rem", color: "#8b949e", marginBottom: "0.3rem" }}>Middle Seat Count</label>
+                    <input type="number" defaultValue="0" style={{ width: "100%", padding: "0.7rem", background: "#1f2738", border: "1px solid #334155", color: "#fff", borderRadius: "4px" }} />
+                  </div>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "2rem" }}>
+                  <div>
+                    <label style={{ display: "block", fontSize: "0.85rem", color: "#8b949e", marginBottom: "0.3rem" }}>Lower Seat Price</label>
+                    <input type="number" defaultValue="0" style={{ width: "100%", padding: "0.7rem", background: "#1f2738", border: "1px solid #334155", color: "#fff", borderRadius: "4px" }} />
+                  </div>
+                  <div>
+                    <label style={{ display: "block", fontSize: "0.85rem", color: "#8b949e", marginBottom: "0.3rem" }}>Lower Seat Count</label>
+                    <input type="number" defaultValue="0" style={{ width: "100%", padding: "0.7rem", background: "#1f2738", border: "1px solid #334155", color: "#fff", borderRadius: "4px" }} />
+                  </div>
+                </div>
+
+                <div style={{ textAlign: "center" }}>
+                  <button type="submit" style={{ background: "#e50914", color: "#fff", padding: "0.7rem 2.5rem", border: "none", borderRadius: "4px", fontWeight: "bold", cursor: "pointer" }}>Submit</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        );
+      }
+
+      return null;
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
