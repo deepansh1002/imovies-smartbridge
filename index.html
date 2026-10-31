@@ -573,7 +573,7 @@
           name: "Rrr", 
           date: "Mar 25, 2022", 
           genres: ["Action", "Drama"], 
-          poster: "https://image.tmdb.org/t/p/w500/vNVFt6dtcqnI7hqa6LFBUibuFiw.jpg" 
+          poster: "https://image.tmdb.org/t/p/w500/i0Y0wP8H6SRgjr6QmuwbtQbS24D.jpg" 
         },
         { 
           id: "2", 
@@ -668,7 +668,7 @@
           showtime: "21:00",
           seats: "Balcony Seats: 162",
           price: "200₹",
-          poster: "https://image.tmdb.org/t/p/w500/vNVFt6dtcqnI7hqa6LFBUibuFiw.jpg"
+          poster: "https://image.tmdb.org/t/p/w500/i0Y0wP8H6SRgjr6QmuwbtQbS24D.jpg"
         },
         {
           id: "BK-103",
@@ -1003,7 +1003,7 @@
             <div class="bookings-grid" style="padding: 0;">
               ${STATE.bookings.map(b => `
                 <div class="booking-ticket">
-                  <img src="${b.poster}" alt="${b.movie}" onerror="this.src='https://image.tmdb.org/t/p/w500/vNVFt6dtcqnI7hqa6LFBUibuFiw.jpg';">
+                  <img src="${b.poster}" alt="${b.movie}" onerror="this.src='https://image.tmdb.org/t/p/w500/i0Y0wP8H6SRgjr6QmuwbtQbS24D.jpg';">
                   <div class="booking-ticket-info">
                     <div>
                       <p style="margin-bottom: 0.25rem;"><strong>Movie:</strong> ${b.movie}</p>
@@ -1355,7 +1355,7 @@
         name,
         date: "Today",
         genres,
-        poster: customPoster || "https://image.tmdb.org/t/p/w500/vNVFt6dtcqnI7hqa6LFBUibuFiw.jpg"
+        poster: customPoster || "https://image.tmdb.org/t/p/w500/i0Y0wP8H6SRgjr6QmuwbtQbS24D.jpg"
       };
       STATE.movies.unshift(newMovie);
       showToast('Movie added to catalog!');
